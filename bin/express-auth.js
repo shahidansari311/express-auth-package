@@ -1,3 +1,11 @@
 #!/usr/bin/env node
 
-console.log("Express Auth CLI");
+const init = require("../src/cli/commands/init");
+
+const command = process.argv[2];
+
+if (command === "init") {
+  init();
+} else {
+  console.log("Usage: express-auth init");
+}
