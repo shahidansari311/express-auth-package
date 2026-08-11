@@ -19,5 +19,8 @@
     "scaffolding"
   ],
   "author": "Shahid",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "inquirer": "^14.0.2"
+  }
 }
