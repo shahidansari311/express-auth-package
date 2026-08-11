@@ -1,13 +1,23 @@
 {
   "name": "express-auth",
   "version": "1.0.0",
-  "description": "",
+  "description": "CLI for generating Express authentication projects",
   "type": "commonjs",
-  "main": "index.js",
-  "directories": {
-    "test": "tests"
+  "bin": {
+    "express-auth": "./bin/express-auth.js"
   },
   "scripts": {
+    "cli": "node bin/express-auth.js",
     "test": "echo \"Error: no test specified\" && exit 1"
-  }
+  },
+  "keywords": [
+    "express",
+    "auth",
+    "authentication",
+    "cli",
+    "generator",
+    "scaffolding"
+  ],
+  "author": "Shahid",
+  "license": "MIT"
 }
