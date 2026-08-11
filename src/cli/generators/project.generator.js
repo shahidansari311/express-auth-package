@@ -10,6 +10,24 @@ function createProject(config) {
 
   fs.mkdirSync(projectPath, { recursive: true });
 
+  const baseTemplatePath = path.resolve(
+    __dirname,
+    "../../../templates/base"
+  );
+
+  const coreTemplatePath = path.resolve(
+    __dirname,
+    "../../../templates/core"
+  );
+
+  fs.cpSync(baseTemplatePath, projectPath, {
+    recursive: true,
+  });
+
+  fs.cpSync(coreTemplatePath, projectPath, {
+    recursive: true,
+  });
+
   console.log(`\n📁 Creating project: ${config.projectName}`);
 
   return projectPath;
