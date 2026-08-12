@@ -1,6 +1,6 @@
 const express = require("express");
 
-const { register,login, me } = require("../controllers/auth.controller");
+const { register, login, me, refresh } = require("../controllers/auth.controller");
 const validate = require("../middleware/validate.middleware");
 const { 
   registerSchema,
@@ -20,6 +20,11 @@ router.post(
   "/login",
   validate(loginSchema),
   login
+);
+
+router.post(
+  "/refresh",
+  refresh
 );
 
 router.get(

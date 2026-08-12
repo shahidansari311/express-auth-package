@@ -4,7 +4,7 @@ const {
   createUser,
 } = require("../repositories/user.repository");
 const refreshRepo = require("../repositories/refresh.repository");
-const { generateAccessToken, generateRefreshToken, hashToken } = require("../utils/token");
+const { generateAccessToken, generateRefreshToken, hashToken, verifyRefreshToken } = require("../utils/token");
 
 const {
   hashPassword,
@@ -134,8 +134,70 @@ const getCurrentUser = async (userId) => {
   };
 };
 
+const refreshTokenUser = async (token) => {
+  let decoded;
+  try {
+    decoded = verifyRefreshToken(token);
+  } catch (err) {
+    const error = new Error("Invalid refresh token");
+    error.statusCode = 401;
+    throw error;
+  }
+
+  const tokenHash = hashToken(token);
+  const session = await refreshRepo.findByTokenHash(tokenHash);
+
+  if (!session) {
+    const error = new Error("Invalid refresh session");
+    error.statusCode = 401;
+    throw error;
+  }
+
+  if (session.revokedAt) {
+    const error = new Error("Refresh token has been revoked");
+    error.statusCode = 401;
+    throw error;
+  }
+
+  if (new Date() > new Date(session.expiresAt)) {
+    const error = new Error("Refresh token expired");
+    error.statusCode = 401;
+    throw error;
+  }
+
+  const user = await findById(session.userId);
+  if (!user || !user.isActive) {
+    const error = new Error("User account is inactive or not found");
+    error.statusCode = 403;
+    throw error;
+  }
+
+  // Revoke the old session
+  await refreshRepo.revoke(session.id);
+
+  // Generate new tokens
+  const accessToken = generateAccessToken({ userId: user.id });
+  const newRefreshToken = generateRefreshToken({ userId: user.id });
+  
+  const newTokenHash = hashToken(newRefreshToken);
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 7);
+
+  await refreshRepo.create({
+    userId: user.id,
+    tokenHash: newTokenHash,
+    expiresAt,
+  });
+
+  return {
+    accessToken,
+    refreshToken: newRefreshToken,
+  };
+};
+
 module.exports = {
   registerUser,
   loginUser,
-  getCurrentUser
+  getCurrentUser,
+  refreshTokenUser,
 };

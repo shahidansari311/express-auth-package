@@ -1,7 +1,8 @@
 const { 
   registerUser,
   loginUser ,
-  getCurrentUser
+  getCurrentUser,
+  refreshTokenUser
 } = require("../services/auth.service");
 const { cookieConfig } = require("../config/cookie");
 
@@ -57,8 +58,35 @@ const me = async (req, res, next) => {
   }
 };
 
+const refresh = async (req, res, next) => {
+  try {
+    const oldRefreshToken = req.cookies.refreshToken;
+
+    if (!oldRefreshToken) {
+      const error = new Error("Refresh token missing");
+      error.statusCode = 401;
+      throw error;
+    }
+
+    const { accessToken, refreshToken } = await refreshTokenUser(oldRefreshToken);
+
+    res.cookie("refreshToken", refreshToken, cookieConfig);
+
+    res.status(200).json({
+      success: true,
+      message: "Token refreshed successfully",
+      data: {
+        accessToken,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
-  me
+  me,
+  refresh
 };
