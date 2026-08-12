@@ -41,30 +41,25 @@ function createProject(config) {
   createPackageJson(projectPath, config);
 
   // Generate .env and .env.example
-  let envContent = `PORT=5000\n`;
-
+  let baseEnvContent = `PORT=5000\n`;
   const dbName = path.basename(config.projectName);
 
   if (config.database === "mongodb") {
-    envContent += `MONGO_URI=mongodb://localhost:27017/${dbName}\n`;
+    baseEnvContent += `MONGO_URI=mongodb://localhost:27017/${dbName}\n`;
   }
 
   if (config.database === "postgresql") {
-    envContent +=
-      `DATABASE_URL="postgresql://postgres:postgres@localhost:5432/${dbName}?schema=public"\n`;
+    baseEnvContent += `DATABASE_URL="postgresql://postgres:postgres@localhost:5432/${dbName}?schema=public"\n`;
   }
-  envContent += `JWT_ACCESS_SECRET=change-this-to-a-long-random-secret\n`;
-  envContent += `JWT_ACCESS_EXPIRES_IN=15m\n`;
 
-  fs.writeFileSync(
-    path.join(projectPath, ".env"),
-    envContent
-  );
+  const crypto = require("crypto");
+  const accessSecret = crypto.randomBytes(32).toString("hex");
 
-  fs.writeFileSync(
-    path.join(projectPath, ".env.example"),
-    envContent
-  );
+  let envContent = baseEnvContent + `JWT_ACCESS_SECRET=${accessSecret}\nJWT_ACCESS_EXPIRES_IN=15m\n`;
+  let envExampleContent = baseEnvContent + `JWT_ACCESS_SECRET=\nJWT_ACCESS_EXPIRES_IN=15m\n`;
+
+  fs.writeFileSync(path.join(projectPath, ".env"), envContent);
+  fs.writeFileSync(path.join(projectPath, ".env.example"), envExampleContent);
 
   console.log(
     `\n📁 Creating project: ${config.projectName}`

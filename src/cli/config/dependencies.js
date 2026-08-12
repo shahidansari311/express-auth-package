@@ -4,6 +4,10 @@ const baseDependencies = {
   dotenv: "^17.0.0",
   zod: "^4.0.0",
   bcrypt: "^6.0.0",
+  jsonwebtoken: "^9.0.0",
+  cors: "^2.8.5",
+  helmet: "^8.0.0",
+  "express-rate-limit": "^7.4.0",
 };
 
 const baseDevDependencies = {

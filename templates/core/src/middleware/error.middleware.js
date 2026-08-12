@@ -27,6 +27,15 @@ function errorHandler(err, req, res, next) {
     });
   }
 
+  // Prisma unique constraint error
+  if (err.code === "P2002") {
+    const field = err.meta && err.meta.target ? err.meta.target[0] : "Field";
+    return res.status(409).json({
+      success: false,
+      message: `${field} already exists`,
+    });
+  }
+
   // Default application error
   const statusCode = err.statusCode || 500;
 
