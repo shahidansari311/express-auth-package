@@ -3,7 +3,8 @@ const {
   findByEmail,
   createUser,
 } = require("../repositories/user.repository");
-const { generateAccessToken } = require("../utils/token");
+const refreshRepo = require("../repositories/refresh.repository");
+const { generateAccessToken, generateRefreshToken, hashToken } = require("../utils/token");
 
 const {
   hashPassword,
@@ -65,9 +66,31 @@ const loginUser = async ({ email, password }) => {
     error.statusCode = 401;
     throw error;
   }
+  
+  if (!user.isActive) {
+    const error = new Error("User account is inactive");
+    error.statusCode = 403;
+    throw error;
+  }
 
   const accessToken = generateAccessToken({
     userId: user.id,
+  });
+
+  const refreshToken = generateRefreshToken({
+    userId: user.id,
+  });
+  
+  const tokenHash = hashToken(refreshToken);
+  
+  // Calculate expiry date (7 days)
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 7);
+
+  await refreshRepo.create({
+    userId: user.id,
+    tokenHash,
+    expiresAt,
   });
 
   return {
@@ -80,8 +103,8 @@ const loginUser = async ({ email, password }) => {
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     },
-
     accessToken,
+    refreshToken,
   };
 };
 

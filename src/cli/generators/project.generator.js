@@ -54,9 +54,17 @@ function createProject(config) {
 
   const crypto = require("crypto");
   const accessSecret = crypto.randomBytes(32).toString("hex");
+  const refreshSecret = crypto.randomBytes(32).toString("hex");
 
-  let envContent = baseEnvContent + `JWT_ACCESS_SECRET=${accessSecret}\nJWT_ACCESS_EXPIRES_IN=15m\n`;
-  let envExampleContent = baseEnvContent + `JWT_ACCESS_SECRET=\nJWT_ACCESS_EXPIRES_IN=15m\n`;
+  const commonVars = `JWT_ACCESS_EXPIRES_IN=15m
+JWT_REFRESH_EXPIRES_IN=7d
+COOKIE_SECURE=false
+COOKIE_SAME_SITE=lax
+COOKIE_DOMAIN=localhost
+`;
+
+  let envContent = baseEnvContent + `JWT_ACCESS_SECRET=${accessSecret}\nJWT_REFRESH_SECRET=${refreshSecret}\n${commonVars}`;
+  let envExampleContent = baseEnvContent + `JWT_ACCESS_SECRET=\nJWT_REFRESH_SECRET=\n${commonVars}`;
 
   fs.writeFileSync(path.join(projectPath, ".env"), envContent);
   fs.writeFileSync(path.join(projectPath, ".env.example"), envExampleContent);

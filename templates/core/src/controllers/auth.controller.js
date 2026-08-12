@@ -3,6 +3,7 @@ const {
   loginUser ,
   getCurrentUser
 } = require("../services/auth.service");
+const { cookieConfig } = require("../config/cookie");
 
 const register = async (req, res, next) => {
   try {
@@ -23,11 +24,17 @@ const register = async (req, res, next) => {
 const login = async (req, res, next) => {
   try {
     const result = await loginUser(req.body);
+    const { refreshToken, accessToken, user } = result;
+
+    res.cookie("refreshToken", refreshToken, cookieConfig);
 
     res.status(200).json({
       success: true,
       message: "Login successful",
-      data: result,
+      data: {
+        accessToken,
+        user,
+      },
     });
   } catch (error) {
     next(error);
