@@ -2,7 +2,7 @@ const User = require("../models/user.model");
 
 const findByEmail = async (email) => {
   return User.findOne({ email })
-    .select("-password")
+    .select("+password")
     .lean();
 };
 

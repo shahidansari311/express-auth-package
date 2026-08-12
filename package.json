@@ -23,6 +23,7 @@
   "dependencies": {
     "bcrypt": "^6.0.0",
     "inquirer": "^14.0.2",
+    "jsonwebtoken": "^9.0.3",
     "zod": "^4.4.3"
   }
 }

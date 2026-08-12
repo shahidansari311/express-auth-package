@@ -53,6 +53,8 @@ function createProject(config) {
     envContent +=
       `DATABASE_URL="postgresql://postgres:postgres@localhost:5432/${dbName}?schema=public"\n`;
   }
+  envContent += `JWT_ACCESS_SECRET=change-this-to-a-long-random-secret\n`;
+  envContent += `JWT_ACCESS_EXPIRES_IN=15m\n`;
 
   fs.writeFileSync(
     path.join(projectPath, ".env"),

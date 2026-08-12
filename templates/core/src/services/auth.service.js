@@ -1,8 +1,9 @@
 const {
+  findById,
   findByEmail,
   createUser,
 } = require("../repositories/user.repository");
-
+const { generateAccessToken } = require("../utils/token");
 
 const {
   hashPassword,
@@ -65,6 +66,40 @@ const loginUser = async ({ email, password }) => {
     throw error;
   }
 
+  const accessToken = generateAccessToken({
+    userId: user.id,
+  });
+
+  return {
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      isEmailVerified: user.isEmailVerified,
+      isActive: user.isActive,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    },
+
+    accessToken,
+  };
+};
+
+const getCurrentUser = async (userId) => {
+  const user = await findById(userId);
+
+  if (!user) {
+    const error = new Error("User not found");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  if (!user.isActive) {
+    const error = new Error("User account is inactive");
+    error.statusCode = 403;
+    throw error;
+  }
+
   return {
     id: user.id,
     name: user.name,
@@ -78,5 +113,6 @@ const loginUser = async ({ email, password }) => {
 
 module.exports = {
   registerUser,
-  loginUser
+  loginUser,
+  getCurrentUser
 };
