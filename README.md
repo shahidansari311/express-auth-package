@@ -24,6 +24,17 @@ Forget writing the same boilerplate over and over again. Run a single command to
 
 ---
 
+## 👶 Prerequisites (For Beginners)
+
+Before using this tool, you need to have a few things installed on your computer:
+1. **Node.js**: The runtime environment. [Download it here](https://nodejs.org/).
+2. **A Database**: 
+   - If you choose MongoDB: Install [MongoDB Community Server](https://www.mongodb.com/try/download/community) or use [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
+   - If you choose PostgreSQL: Install [PostgreSQL](https://www.postgresql.org/download/) or use a cloud database like [Supabase](https://supabase.com/).
+3. **An API Tester**: Download a tool like [Postman](https://www.postman.com/) or [Insomnia](https://insomnia.rest/) to test your new API endpoints.
+
+---
+
 ## 🚀 Quick Start
 
 You can run the generator directly without installing it globally using `npx`:
@@ -106,6 +117,21 @@ You should see:
 ```
 Server running on port 5000
 ```
+
+### 6. Test Your New API (For Beginners)
+Now that your server is running, you can test it!
+1. Open **Postman** (or your API tester).
+2. Create a new `POST` request to `http://localhost:5000/api/auth/register`.
+3. Go to the **Body** tab, select **raw** and **JSON**.
+4. Enter the following JSON:
+   ```json
+   {
+     "name": "John Doe",
+     "email": "john@example.com",
+     "password": "strongpassword123"
+   }
+   ```
+5. Click **Send**! You should get a `201 Created` response back. You now have a fully functioning authentication backend!
 
 ---
 
