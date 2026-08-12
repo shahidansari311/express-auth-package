@@ -3,7 +3,9 @@ const {
   loginUser ,
   getCurrentUser,
   refreshTokenUser,
-  logoutUser
+  logoutUser,
+  verifyEmail: verifyEmailService,
+  resendVerificationEmail,
 } = require("../services/auth.service");
 const { cookieConfig } = require("../config/cookie");
 
@@ -13,7 +15,7 @@ const register = async (req, res, next) => {
 
     return res.status(201).json({
       success: true,
-      message: "User registered successfully",
+      message: "User registered successfully. Please check your email to verify your account.",
       data: {
         user,
       },
@@ -102,10 +104,42 @@ const logout = async (req, res, next) => {
   }
 };
 
+const verifyEmail = async (req, res, next) => {
+  try {
+    const { token } = req.body;
+
+    await verifyEmailService(token);
+
+    res.status(200).json({
+      success: true,
+      message: "Email verified successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const resendVerification = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    await resendVerificationEmail(email);
+
+    res.status(200).json({
+      success: true,
+      message: "If your account exists and is not verified, a verification email has been sent.",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
   me,
   refresh,
-  logout
+  logout,
+  verifyEmail,
+  resendVerification,
 };

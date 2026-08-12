@@ -8,6 +8,7 @@ const baseDependencies = {
   cors: "^2.8.5",
   helmet: "^8.0.0",
   "express-rate-limit": "^7.4.0",
+  nodemailer: "^6.9.13",
 };
 
 const baseDevDependencies = {

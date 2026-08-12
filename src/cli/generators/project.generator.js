@@ -64,6 +64,11 @@ COOKIE_DOMAIN=localhost
 CORS_ORIGIN=http://localhost:3000
 AUTH_RATE_LIMIT_WINDOW_MS=900000
 AUTH_RATE_LIMIT_MAX=100
+SMTP_HOST=
+SMTP_PORT=587
+SMTP_USER=
+SMTP_PASSWORD=
+SMTP_FROM=noreply@example.com
 `;
 
   let envContent = baseEnvContent + `JWT_ACCESS_SECRET=${accessSecret}\nJWT_REFRESH_SECRET=${refreshSecret}\n${commonVars}`;

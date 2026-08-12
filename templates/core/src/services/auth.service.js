@@ -2,9 +2,12 @@ const {
   findById,
   findByEmail,
   createUser,
+  updateById,
 } = require("../repositories/user.repository");
 const refreshRepo = require("../repositories/refresh.repository");
-const { generateAccessToken, generateRefreshToken, hashToken, verifyRefreshToken } = require("../utils/token");
+const verificationRepo = require("../repositories/verification.repository");
+const { generateAccessToken, generateRefreshToken, hashToken, verifyRefreshToken, generateRandomToken } = require("../utils/token");
+const { sendVerificationEmail } = require("./email.service");
 
 const {
   hashPassword,
@@ -34,6 +37,19 @@ const registerUser = async ({ name, email, password }) => {
     email,
     password: hashedPassword,
   });
+
+  const verificationToken = generateRandomToken();
+  const tokenHash = hashToken(verificationToken);
+  const expiresAt = new Date();
+  expiresAt.setHours(expiresAt.getHours() + 24);
+
+  await verificationRepo.create({
+    userId: user.id,
+    tokenHash,
+    expiresAt,
+  });
+
+  await sendVerificationEmail(user.email, verificationToken);
 
   // Never return the password
   return {
@@ -206,10 +222,65 @@ const logoutUser = async (token) => {
   }
 };
 
+const verifyEmail = async (token) => {
+  const tokenHash = hashToken(token);
+  const verificationSession = await verificationRepo.findByTokenHash(tokenHash);
+
+  if (!verificationSession) {
+    const error = new Error("Invalid or expired verification token");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  if (verificationSession.consumedAt) {
+    const error = new Error("Email already verified");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  if (new Date() > new Date(verificationSession.expiresAt)) {
+    const error = new Error("Verification token expired");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  await verificationRepo.consume(verificationSession.id);
+  await updateById(verificationSession.userId, { isEmailVerified: true });
+};
+
+const resendVerificationEmail = async (email) => {
+  const user = await findByEmail(email);
+
+  if (!user) {
+    return; // Don't reveal if account exists
+  }
+
+  if (user.isEmailVerified) {
+    const error = new Error("Email is already verified");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const verificationToken = generateRandomToken();
+  const tokenHash = hashToken(verificationToken);
+  const expiresAt = new Date();
+  expiresAt.setHours(expiresAt.getHours() + 24);
+
+  await verificationRepo.create({
+    userId: user.id,
+    tokenHash,
+    expiresAt,
+  });
+
+  await sendVerificationEmail(user.email, verificationToken);
+};
+
 module.exports = {
   registerUser,
   loginUser,
   getCurrentUser,
   refreshTokenUser,
   logoutUser,
+  verifyEmail,
+  resendVerificationEmail,
 };

@@ -41,7 +41,25 @@ const loginSchema = z.object({
     .min(1, "Password is required"),
 });
 
+const verifyEmailSchema = z.object({
+  token: z.string({
+    required_error: "Token is required",
+  }).min(1, "Token is required"),
+});
+
+const resendVerificationSchema = z.object({
+  email: z
+    .string({
+      required_error: "Email is required",
+    })
+    .trim()
+    .toLowerCase()
+    .email("Please provide a valid email address"),
+});
+
 module.exports = {
   registerSchema,
   loginSchema,
+  verifyEmailSchema,
+  resendVerificationSchema,
 };
