@@ -1,4 +1,8 @@
-const User = require("../models/user.model");
+const {
+  findByEmail,
+  createUser,
+} = require("../repositories/user.repository");
+
 const { hashPassword } = require("../utils/password");
 
 const registerUser = async ({ name, email, password }) => {
