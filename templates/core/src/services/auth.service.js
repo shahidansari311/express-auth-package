@@ -7,11 +7,15 @@ const { hashPassword } = require("../utils/password");
 
 const registerUser = async ({ name, email, password }) => {
   // Check whether the user already exists
-  const existingUser = await User.findByEmail(email);
+  const existingUser = await findByEmail(email);
 
   if (existingUser) {
-    const error = new Error("User with this email already exists");
+    const error = new Error(
+      "User with this email already exists"
+    );
+
     error.statusCode = 409;
+
     throw error;
   }
 
@@ -19,7 +23,7 @@ const registerUser = async ({ name, email, password }) => {
   const hashedPassword = await hashPassword(password);
 
   // Create the user
-  const user = await User.create({
+  const user = await createUser({
     name,
     email,
     password: hashedPassword,
