@@ -1,11 +1,17 @@
 const { prisma } = require("../config/database");
 
+/**
+ * Creates a new password reset token in the database.
+ */
 const create = async (data) => {
   return prisma.passwordResetToken.create({
     data,
   });
 };
 
+/**
+ * Finds a reset token by its hash.
+ */
 const findByTokenHash = async (tokenHash) => {
   return prisma.passwordResetToken.findUnique({
     where: {
@@ -14,6 +20,9 @@ const findByTokenHash = async (tokenHash) => {
   });
 };
 
+/**
+ * Marks a reset token as consumed (used).
+ */
 const consume = async (id) => {
   return prisma.passwordResetToken.update({
     where: {
@@ -25,6 +34,9 @@ const consume = async (id) => {
   });
 };
 
+/**
+ * Manually deletes expired reset tokens.
+ */
 const deleteExpired = async () => {
   await prisma.passwordResetToken.deleteMany({
     where: {

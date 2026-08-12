@@ -15,6 +15,13 @@ const {
   comparePassword,
 } = require("../utils/password");
 
+/**
+ * Registers a new user.
+ * 1. Checks if the email is already in use.
+ * 2. Hashes the password using bcrypt.
+ * 3. Saves the user to the database.
+ * 4. Generates a verification token and sends an email.
+ */
 const registerUser = async ({ name, email, password }) => {
   // Check whether the user already exists
   const existingUser = await findByEmail(email);
@@ -64,6 +71,14 @@ const registerUser = async ({ name, email, password }) => {
   };
 };
 
+/**
+ * Authenticates a user and generates JWT tokens.
+ * 1. Finds the user by email.
+ * 2. Verifies the password using bcrypt.
+ * 3. Ensures the account is active.
+ * 4. Generates short-lived Access Token and long-lived Refresh Token.
+ * 5. Saves the Refresh Token hash in the database.
+ */
 const loginUser = async ({ email, password }) => {
   const user = await findByEmail(email);
 
@@ -125,6 +140,10 @@ const loginUser = async ({ email, password }) => {
   };
 };
 
+/**
+ * Retrieves the current user's details by ID.
+ * Ensures the account is still active before returning data.
+ */
 const getCurrentUser = async (userId) => {
   const user = await findById(userId);
 
@@ -151,6 +170,13 @@ const getCurrentUser = async (userId) => {
   };
 };
 
+/**
+ * Refreshes an access token using a valid refresh token.
+ * 1. Verifies the refresh token JWT signature.
+ * 2. Checks the database to ensure the token isn't revoked or expired.
+ * 3. Revokes the old token (token rotation).
+ * 4. Generates and saves a new pair of tokens.
+ */
 const refreshTokenUser = async (token) => {
   let decoded;
   try {
@@ -212,6 +238,9 @@ const refreshTokenUser = async (token) => {
   };
 };
 
+/**
+ * Logs a user out by revoking their refresh token in the database.
+ */
 const logoutUser = async (token) => {
   if (!token) return;
 
@@ -223,6 +252,10 @@ const logoutUser = async (token) => {
   }
 };
 
+/**
+ * Verifies a user's email address using a token sent to them.
+ * Validates token existence, expiration, and ensures it hasn't been used already.
+ */
 const verifyEmail = async (token) => {
   const tokenHash = hashToken(token);
   const verificationSession = await verificationRepo.findByTokenHash(tokenHash);
@@ -249,6 +282,10 @@ const verifyEmail = async (token) => {
   await updateById(verificationSession.userId, { isEmailVerified: true });
 };
 
+/**
+ * Resends the email verification OTP.
+ * Quietly returns if the user doesn't exist to prevent email enumeration.
+ */
 const resendVerificationEmail = async (email) => {
   const user = await findByEmail(email);
 
@@ -276,6 +313,10 @@ const resendVerificationEmail = async (email) => {
   await sendVerificationEmail(user.email, verificationToken);
 };
 
+/**
+ * Initiates the forgot password flow.
+ * Generates a 1-hour expiration token, saves its hash in the DB, and emails the user.
+ */
 const forgotPassword = async (email) => {
   const user = await findByEmail(email);
 
@@ -297,6 +338,12 @@ const forgotPassword = async (email) => {
   await sendPasswordResetEmail(user.email, resetToken);
 };
 
+/**
+ * Resets a user's password using the token sent to their email.
+ * 1. Validates the token's expiry and consumption status.
+ * 2. Hashes the new password and updates the database.
+ * 3. Revokes ALL active refresh sessions for this user so they must log in again everywhere.
+ */
 const resetPassword = async (token, newPassword) => {
   const tokenHash = hashToken(token);
   const resetSession = await resetRepo.findByTokenHash(tokenHash);
