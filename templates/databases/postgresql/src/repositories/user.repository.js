@@ -31,9 +31,18 @@ const updateById = async (id, data) => {
   });
 };
 
+const deleteById = async (id) => {
+  return prisma.user.delete({
+    where: {
+      id,
+    },
+  });
+};
+
 module.exports = {
   findByEmail,
   findById,
   createUser,
   updateById,
+  deleteById,
 };
