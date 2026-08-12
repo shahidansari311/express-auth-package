@@ -71,7 +71,20 @@ npx prisma db push
 npx prisma generate
 ```
 
-### 4. Start the Development Server
+### 4. Configure Environment Variables
+The generator automatically creates a `.env` file for you, populated with secure, randomly generated JWT secrets. However, you will need to configure your email server if you want to send live emails:
+
+Open the `.env` file in your code editor and look for the SMTP section:
+```env
+SMTP_HOST=smtp.mailtrap.io
+SMTP_PORT=2525
+SMTP_USER=your_smtp_user
+SMTP_PASSWORD=your_smtp_password
+SMTP_FROM=noreply@yourdomain.com
+```
+*Note: If you leave the SMTP variables empty during local development, the application will gracefully fallback to logging the email contents (including verification tokens) directly to your server console so you can still test the flow!*
+
+### 5. Start the Development Server
 ```bash
 npm run dev
 ```
