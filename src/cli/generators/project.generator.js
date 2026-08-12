@@ -61,6 +61,9 @@ JWT_REFRESH_EXPIRES_IN=7d
 COOKIE_SECURE=false
 COOKIE_SAME_SITE=lax
 COOKIE_DOMAIN=localhost
+CORS_ORIGIN=http://localhost:3000
+AUTH_RATE_LIMIT_WINDOW_MS=900000
+AUTH_RATE_LIMIT_MAX=100
 `;
 
   let envContent = baseEnvContent + `JWT_ACCESS_SECRET=${accessSecret}\nJWT_REFRESH_SECRET=${refreshSecret}\n${commonVars}`;
