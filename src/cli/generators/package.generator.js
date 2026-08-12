@@ -6,12 +6,26 @@ const {
   baseDevDependencies,
   databaseDependencies,
   databaseDevDependencies,
+  featureDependencies,
 } = require("../config/dependencies");
 
 function createPackageJson(projectPath, config) {
+  let extraDependencies = {};
+  if (config.features && Array.isArray(config.features)) {
+    config.features.forEach((feature) => {
+      if (featureDependencies[feature]) {
+        extraDependencies = {
+          ...extraDependencies,
+          ...featureDependencies[feature],
+        };
+      }
+    });
+  }
+
   const dependencies = {
     ...baseDependencies,
     ...(databaseDependencies[config.database] || {}),
+    ...extraDependencies,
   };
 
   const devDependencies = {

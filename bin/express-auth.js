@@ -40,6 +40,15 @@ const main = async () => {
           { name: "PostgreSQL (Prisma)", value: "postgresql" }
         ],
         default: "mongodb"
+      },
+      {
+        type: "checkbox",
+        name: "features",
+        message: "Select additional features to include:",
+        choices: [
+          { name: "Email OTP Verification", value: "email-otp", checked: true },
+          { name: "Password Reset (Email)", value: "password-reset", checked: true }
+        ]
       }
     ]);
 
@@ -48,7 +57,7 @@ const main = async () => {
     createProject({
       projectName: answers.projectName,
       database: answers.database,
-      features: []
+      features: answers.features
     });
 
     console.log(`\n${colors.bright}${colors.green}🎉 Project '${answers.projectName}' created successfully!${colors.reset}`);
