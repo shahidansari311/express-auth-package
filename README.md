@@ -40,7 +40,7 @@ Before using this tool, you need to have a few things installed on your computer
 You can run the generator directly without installing it globally using `npx`:
 
 ```bash
-npx @shahid_310/express-auth-generator
+npx express-auth-pro-cli
 ```
 
 You will be prompted to enter a project name and select your preferred database:
