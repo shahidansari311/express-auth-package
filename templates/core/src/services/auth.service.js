@@ -195,9 +195,21 @@ const refreshTokenUser = async (token) => {
   };
 };
 
+const logoutUser = async (token) => {
+  if (!token) return;
+
+  const tokenHash = hashToken(token);
+  const session = await refreshRepo.findByTokenHash(tokenHash);
+
+  if (session && !session.revokedAt) {
+    await refreshRepo.revoke(session.id);
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   getCurrentUser,
   refreshTokenUser,
+  logoutUser,
 };

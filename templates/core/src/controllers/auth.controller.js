@@ -2,7 +2,8 @@ const {
   registerUser,
   loginUser ,
   getCurrentUser,
-  refreshTokenUser
+  refreshTokenUser,
+  logoutUser
 } = require("../services/auth.service");
 const { cookieConfig } = require("../config/cookie");
 
@@ -84,9 +85,27 @@ const refresh = async (req, res, next) => {
   }
 };
 
+const logout = async (req, res, next) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+
+    await logoutUser(refreshToken);
+
+    res.clearCookie("refreshToken", cookieConfig);
+
+    res.status(200).json({
+      success: true,
+      message: "Logout successful",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
   me,
-  refresh
+  refresh,
+  logout
 };
