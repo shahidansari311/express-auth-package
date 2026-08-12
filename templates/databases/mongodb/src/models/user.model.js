@@ -45,45 +45,4 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-const UserModel = mongoose.model("User", userSchema);
-
-const User = {
-  async create(data) {
-    const user = await UserModel.create(data);
-
-    return user.toObject();
-  },
-
-  async findByEmail(email) {
-    return UserModel.findOne({ email })
-      .select("+password")
-      .lean();
-  },
-
-  async findById(id) {
-    return UserModel.findById(id)
-      .select("-password")
-      .lean();
-  },
-
-  async updateById(id, data) {
-    return UserModel.findByIdAndUpdate(
-      id,
-      data,
-      {
-        new: true,
-        runValidators: true,
-      }
-    )
-      .select("-password")
-      .lean();
-  },
-
-  async deleteById(id) {
-    return UserModel.findByIdAndDelete(id)
-      .select("-password")
-      .lean();
-  },
-};
-
-module.exports = User;
+module.exports = mongoose.model("User", userSchema);
