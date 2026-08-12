@@ -40,7 +40,7 @@ Before using this tool, you need to have a few things installed on your computer
 You can run the generator directly without installing it globally using `npx`:
 
 ```bash
-npx express-auth
+npx express-auth-generator
 ```
 
 You will be prompted to enter a project name and select your preferred database:
@@ -175,3 +175,7 @@ The generated project is strictly structured for maintainability and scale:
 
 ## 📝 License
 MIT
+
+---
+
+**Built with ❤️ by [Shahid Ansari](https://github.com/shahidansari311)**
