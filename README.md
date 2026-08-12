@@ -72,16 +72,30 @@ npx prisma generate
 ```
 
 ### 4. Configure Environment Variables
-The generator automatically creates a `.env` file for you, populated with secure, randomly generated JWT secrets. However, you will need to configure your email server if you want to send live emails:
+The generator automatically creates a `.env` file for you, populated with secure, randomly generated secrets and sensible defaults. 
 
-Open the `.env` file in your code editor and look for the SMTP section:
-```env
-SMTP_HOST=smtp.mailtrap.io
-SMTP_PORT=2525
-SMTP_USER=your_smtp_user
-SMTP_PASSWORD=your_smtp_password
-SMTP_FROM=noreply@yourdomain.com
-```
+Here is a breakdown of all the environment variables you can configure:
+
+| Variable | Description | Default Value |
+| :--- | :--- | :--- |
+| `PORT` | The port your Express server runs on. | `5000` |
+| `MONGO_URI` / `DATABASE_URL` | Your database connection string. | Localhost default |
+| `JWT_ACCESS_SECRET` | Secret used to sign short-lived access tokens. | *Auto-generated 64-char string* |
+| `JWT_REFRESH_SECRET` | Secret used to sign long-lived refresh tokens. | *Auto-generated 64-char string* |
+| `JWT_ACCESS_EXPIRES_IN` | Access token lifespan. | `15m` |
+| `JWT_REFRESH_EXPIRES_IN` | Refresh token lifespan. | `7d` |
+| `COOKIE_SECURE` | Set to `true` in production to require HTTPS. | `false` |
+| `COOKIE_SAME_SITE` | CSRF protection setting for cookies. | `lax` |
+| `COOKIE_DOMAIN` | Domain for the HttpOnly cookie. | `localhost` |
+| `CORS_ORIGIN` | The frontend URL allowed to communicate with this API. | `http://localhost:3000` |
+| `AUTH_RATE_LIMIT_WINDOW_MS` | Timeframe for the rate limiter. | `900000` (15 mins) |
+| `AUTH_RATE_LIMIT_MAX` | Max requests per IP per window. | `100` |
+| `SMTP_HOST` | Your email provider's SMTP host (e.g., `smtp.mailtrap.io`). | *Empty* |
+| `SMTP_PORT` | SMTP Port. | `587` |
+| `SMTP_USER` | SMTP Username. | *Empty* |
+| `SMTP_PASSWORD` | SMTP Password. | *Empty* |
+| `SMTP_FROM` | Sender address for system emails. | `noreply@example.com` |
+
 *Note: If you leave the SMTP variables empty during local development, the application will gracefully fallback to logging the email contents (including verification tokens) directly to your server console so you can still test the flow!*
 
 ### 5. Start the Development Server
