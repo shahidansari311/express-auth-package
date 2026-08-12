@@ -1,5 +1,5 @@
 {
-  "name": "express-auth-generator",
+  "name": "@shahid_310/express-auth-generator",
   "version": "1.0.0",
   "description": "CLI for generating Express authentication projects",
   "type": "commonjs",
