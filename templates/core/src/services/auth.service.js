@@ -6,8 +6,9 @@ const {
 } = require("../repositories/user.repository");
 const refreshRepo = require("../repositories/refresh.repository");
 const verificationRepo = require("../repositories/verification.repository");
+const resetRepo = require("../repositories/reset.repository");
 const { generateAccessToken, generateRefreshToken, hashToken, verifyRefreshToken, generateRandomToken } = require("../utils/token");
-const { sendVerificationEmail } = require("./email.service");
+const { sendVerificationEmail, sendPasswordResetEmail } = require("./email.service");
 
 const {
   hashPassword,
@@ -275,6 +276,61 @@ const resendVerificationEmail = async (email) => {
   await sendVerificationEmail(user.email, verificationToken);
 };
 
+const forgotPassword = async (email) => {
+  const user = await findByEmail(email);
+
+  if (!user) {
+    return; // Prevent email enumeration
+  }
+
+  const resetToken = generateRandomToken();
+  const tokenHash = hashToken(resetToken);
+  const expiresAt = new Date();
+  expiresAt.setHours(expiresAt.getHours() + 1); // 1 hour expiry
+
+  await resetRepo.create({
+    userId: user.id,
+    tokenHash,
+    expiresAt,
+  });
+
+  await sendPasswordResetEmail(user.email, resetToken);
+};
+
+const resetPassword = async (token, newPassword) => {
+  const tokenHash = hashToken(token);
+  const resetSession = await resetRepo.findByTokenHash(tokenHash);
+
+  if (!resetSession) {
+    const error = new Error("Invalid or expired reset token");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  if (resetSession.consumedAt) {
+    const error = new Error("Reset token already used");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  if (new Date() > new Date(resetSession.expiresAt)) {
+    const error = new Error("Reset token expired");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const hashedPassword = await hashPassword(newPassword);
+
+  // Update password
+  await updateById(resetSession.userId, { password: hashedPassword });
+
+  // Mark token as consumed
+  await resetRepo.consume(resetSession.id);
+
+  // Invalidate all active refresh sessions to force re-login everywhere
+  await refreshRepo.revokeAllForUser(resetSession.userId);
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -283,4 +339,6 @@ module.exports = {
   logoutUser,
   verifyEmail,
   resendVerificationEmail,
+  forgotPassword,
+  resetPassword,
 };

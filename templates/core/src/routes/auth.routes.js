@@ -1,12 +1,14 @@
 const express = require("express");
 
-const { register, login, me, refresh, logout, verifyEmail, resendVerification } = require("../controllers/auth.controller");
+const { register, login, me, refresh, logout, verifyEmail, resendVerification, forgotPassword, resetPassword } = require("../controllers/auth.controller");
 const validate = require("../middleware/validate.middleware");
 const { 
   registerSchema,
   loginSchema,
   verifyEmailSchema,
-  resendVerificationSchema
+  resendVerificationSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema
 } = require("../validators/auth.validator");
 const authenticate = require("../middleware/auth.middleware");
 const authRateLimiter = require("../middleware/rate-limiter.middleware");
@@ -50,6 +52,20 @@ router.post(
   authRateLimiter,
   validate(resendVerificationSchema),
   resendVerification
+);
+
+router.post(
+  "/forgot-password",
+  authRateLimiter,
+  validate(forgotPasswordSchema),
+  forgotPassword
+);
+
+router.post(
+  "/reset-password",
+  authRateLimiter,
+  validate(resetPasswordSchema),
+  resetPassword
 );
 
 router.get(

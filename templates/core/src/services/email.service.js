@@ -57,7 +57,22 @@ const sendVerificationEmail = async (email, token) => {
   await sendEmail({ to: email, subject, html });
 };
 
+const sendPasswordResetEmail = async (email, token) => {
+  const subject = "Password Reset Request";
+  const html = `
+    <h1>Password Reset</h1>
+    <p>We received a request to reset your password. Use the following token to reset it:</p>
+    <br/>
+    <strong>${token}</strong>
+    <br/><br/>
+    <p>If you did not request a password reset, please ignore this email. This token will expire soon.</p>
+  `;
+
+  await sendEmail({ to: email, subject, html });
+};
+
 module.exports = {
   sendEmail,
   sendVerificationEmail,
+  sendPasswordResetEmail,
 };

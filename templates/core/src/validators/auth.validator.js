@@ -57,9 +57,33 @@ const resendVerificationSchema = z.object({
     .email("Please provide a valid email address"),
 });
 
+const forgotPasswordSchema = z.object({
+  email: z
+    .string({
+      required_error: "Email is required",
+    })
+    .trim()
+    .toLowerCase()
+    .email("Please provide a valid email address"),
+});
+
+const resetPasswordSchema = z.object({
+  token: z.string({
+    required_error: "Token is required",
+  }).min(1, "Token is required"),
+  newPassword: z
+    .string({
+      required_error: "New password is required",
+    })
+    .min(8, "Password must be at least 8 characters long")
+    .max(128, "Password cannot exceed 128 characters"),
+});
+
 module.exports = {
   registerSchema,
   loginSchema,
   verifyEmailSchema,
   resendVerificationSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
 };
