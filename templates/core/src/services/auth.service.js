@@ -3,6 +3,7 @@ const {
   findByEmail,
   createUser,
   updateById,
+  findByGoogleId,
 } = require("../repositories/user.repository");
 const refreshRepo = require("../repositories/refresh.repository");
 const verificationRepo = require("../repositories/verification.repository");
@@ -84,6 +85,12 @@ const loginUser = async ({ email, password }) => {
 
   if (!user) {
     const error = new Error("Invalid email or password");
+    error.statusCode = 401;
+    throw error;
+  }
+
+  if (!user.password) {
+    const error = new Error("Please log in with Google OAuth.");
     error.statusCode = 401;
     throw error;
   }
@@ -378,6 +385,87 @@ const resetPassword = async (token, newPassword) => {
   await refreshRepo.revokeAllForUser(resetSession.userId);
 };
 
+/**
+ * Logs in a user via OAuth.
+ * 1. Checks if a user with the Google ID or email exists.
+ * 2. Creates the user if they don't exist.
+ * 3. Generates short-lived Access Token and long-lived Refresh Token.
+ */
+const oauthLoginUser = async (profile) => {
+  const email = profile.emails && profile.emails.length > 0 ? profile.emails[0].value : null;
+  const name = profile.displayName;
+  const googleId = profile.id;
+
+  if (!email) {
+    const error = new Error("OAuth provider did not return an email address");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  let user = null;
+
+  if (findByGoogleId) {
+    user = await findByGoogleId(googleId);
+  }
+
+  if (!user) {
+    user = await findByEmail(email);
+    
+    if (user) {
+      // User exists with this email, link googleId if possible
+      await updateById(user.id, { googleId, isEmailVerified: true });
+    } else {
+      // Create new user
+      user = await createUser({
+        name,
+        email,
+        googleId,
+        isEmailVerified: true,
+      });
+    }
+  }
+
+  if (!user.isActive) {
+    const error = new Error("User account is inactive");
+    error.statusCode = 403;
+    throw error;
+  }
+
+  const accessToken = generateAccessToken({
+    userId: user.id,
+  });
+
+  const refreshToken = generateRefreshToken({
+    userId: user.id,
+  });
+
+  const tokenHash = hashToken(refreshToken);
+
+  // Calculate expiry date (7 days)
+  const expiresAt = new Date();
+  expiresAt.setDate(expiresAt.getDate() + 7);
+
+  await refreshRepo.create({
+    userId: user.id,
+    tokenHash,
+    expiresAt,
+  });
+
+  return {
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      isEmailVerified: user.isEmailVerified,
+      isActive: user.isActive,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    },
+    accessToken,
+    refreshToken,
+  };
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -388,4 +476,5 @@ module.exports = {
   resendVerificationEmail,
   forgotPassword,
   resetPassword,
+  oauthLoginUser,
 };

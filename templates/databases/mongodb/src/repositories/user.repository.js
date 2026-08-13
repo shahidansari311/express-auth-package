@@ -24,6 +24,14 @@ const findByEmail = async (email) => {
 };
 
 /**
+ * Finds a user by their Google ID.
+ */
+const findByGoogleId = async (googleId) => {
+  const user = await User.findOne({ googleId }).lean();
+  return mapUser(user);
+};
+
+/**
  * Finds a user by their ID.
  */
 const findById = async (id) => {
@@ -65,6 +73,7 @@ const deleteById = async (id) => {
 module.exports = {
   findByEmail,
   findById,
+  findByGoogleId,
   createUser,
   updateById,
   deleteById,

@@ -4,6 +4,14 @@ const helmet = require("helmet");
 const cors = require("cors");
 const errorHandler = require("./middleware/error.middleware");
 
+// Try loading passport if the oauth feature is enabled
+let passport;
+try {
+  passport = require("./config/passport");
+} catch (e) {
+  // Passport not installed
+}
+
 const authRoutes = require("./routes/auth.routes");
 const app = express();
 
@@ -39,6 +47,13 @@ app.get("/health", (req, res) => {
     message: "Server is running",
   });
 });
+
+// ==========================================
+// 4. Authentication Middleware
+// ==========================================
+if (passport) {
+  app.use(passport.initialize());
+}
 
 // ==========================================
 // 4. API Routes

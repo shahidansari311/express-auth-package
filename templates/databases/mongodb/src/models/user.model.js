@@ -10,6 +10,12 @@ const userSchema = new mongoose.Schema(
       maxlength: [50, "Name cannot exceed 50 characters"],
     },
 
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+
     email: {
       type: String,
       required: [true, "Email is required"],
@@ -24,7 +30,7 @@ const userSchema = new mongoose.Schema(
 
     password: {
       type: String,
-      required: [true, "Password is required"],
+      required: false,
       minlength: [8, "Password must be at least 8 characters long"],
       maxlength: [128, "Password cannot exceed 128 characters"],
       select: false,

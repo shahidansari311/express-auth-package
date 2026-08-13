@@ -47,7 +47,8 @@ const main = async () => {
         message: "Select additional features to include:",
         choices: [
           { name: "Email OTP Verification", value: "email-otp", checked: true },
-          { name: "Password Reset (Email)", value: "password-reset", checked: true }
+          { name: "Password Reset (Email)", value: "password-reset", checked: true },
+          { name: "Google OAuth", value: "oauth", checked: false }
         ]
       }
     ]);

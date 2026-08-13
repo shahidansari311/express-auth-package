@@ -40,6 +40,10 @@ const featureDependencies = {
   },
   "password-reset": {
     nodemailer: "^6.9.13",
+  },
+  "oauth": {
+    passport: "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
   }
 };
 

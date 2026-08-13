@@ -193,6 +193,28 @@ const resetPassword = async (req, res, next) => {
   }
 };
 
+/**
+ * Google OAuth callback
+ * Uses the user object appended to req by passport.
+ */
+const googleOAuthCallback = async (req, res, next) => {
+  try {
+    const { accessToken, refreshToken, user } = req.user; // req.user populated by passport done()
+
+    res.cookie("refreshToken", refreshToken, cookieConfig);
+
+    // Redirect to frontend with access token
+    // In production, you might want to use a more secure method to transfer the access token to the client
+    const redirectUrl = new URL(process.env.CORS_ORIGIN || "http://localhost:3000");
+    redirectUrl.pathname = "/oauth/callback";
+    redirectUrl.searchParams.set("accessToken", accessToken);
+
+    res.redirect(redirectUrl.toString());
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -203,4 +225,5 @@ module.exports = {
   resendVerification,
   forgotPassword,
   resetPassword,
+  googleOAuthCallback,
 };

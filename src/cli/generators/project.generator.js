@@ -69,6 +69,8 @@ SMTP_PORT=587
 SMTP_USER=
 SMTP_PASSWORD=
 SMTP_FROM=noreply@example.com
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
 `;
 
   let envContent = baseEnvContent + `JWT_ACCESS_SECRET=${accessSecret}\nJWT_REFRESH_SECRET=${refreshSecret}\n${commonVars}`;

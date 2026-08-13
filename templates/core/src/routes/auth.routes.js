@@ -1,7 +1,12 @@
 const express = require("express");
 
-const { register, login, me, refresh, logout, verifyEmail, resendVerification, forgotPassword, resetPassword } = require("../controllers/auth.controller");
+const { register, login, me, refresh, logout, verifyEmail, resendVerification, forgotPassword, resetPassword, googleOAuthCallback } = require("../controllers/auth.controller");
 const validate = require("../middleware/validate.middleware");
+
+let passport;
+try {
+  passport = require("passport");
+} catch(e) {}
 const { 
   registerSchema,
   loginSchema,
@@ -119,5 +124,30 @@ router.get(
   authenticate,
   me
 );
+
+if (passport) {
+  /**
+   * @route GET /api/auth/google
+   * @desc Initiate Google OAuth flow
+   * @access Public
+   */
+  router.get(
+    "/google",
+    authRateLimiter,
+    passport.authenticate("google", { scope: ["profile", "email"] })
+  );
+
+  /**
+   * @route GET /api/auth/google/callback
+   * @desc Google OAuth callback
+   * @access Public
+   */
+  router.get(
+    "/google/callback",
+    authRateLimiter,
+    passport.authenticate("google", { session: false, failureRedirect: "/login" }),
+    googleOAuthCallback
+  );
+}
 
 module.exports = router;
