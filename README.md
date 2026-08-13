@@ -106,6 +106,8 @@ Here is a breakdown of all the environment variables you can configure:
 | `SMTP_USER` | SMTP Username. | *Empty* |
 | `SMTP_PASSWORD` | SMTP Password. | *Empty* |
 | `SMTP_FROM` | Sender address for system emails. | `noreply@example.com` |
+| `GOOGLE_CLIENT_ID` | Your Google OAuth Client ID (if OAuth is enabled). | *Empty* |
+| `GOOGLE_CLIENT_SECRET` | Your Google OAuth Client Secret (if OAuth is enabled). | *Empty* |
 
 *Note: If you leave the SMTP variables empty during local development, the application will gracefully fallback to logging the email contents (including verification tokens) directly to your server console so you can still test the flow!*
 
@@ -150,6 +152,8 @@ By default, the server runs on port `5000` and prefixes auth routes with `/api/a
 | `POST` | `/api/auth/resend-verification` | Resend verification email | No |
 | `POST` | `/api/auth/forgot-password` | Dispatch a password reset token | No |
 | `POST` | `/api/auth/reset-password` | Reset password using a token | No |
+| `GET`  | `/api/auth/google` | Initiate Google OAuth flow | No |
+| `GET`  | `/api/auth/google/callback` | Google OAuth callback | No |
 
 ---
 

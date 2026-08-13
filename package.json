@@ -1,6 +1,6 @@
 {
   "name": "express-auth-pro-cli",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "CLI for generating Express authentication projects",
   "type": "commonjs",
   "bin": {
